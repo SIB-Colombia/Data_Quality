@@ -1,12 +1,12 @@
 # Rutinas del SiB Colombia para la generacion de reportes mensuales
 
-# Nombre: Gneracion de reporte mensual de publicacion a travÈs del SiB Colombia
+# Nombre: Gneracion de reporte mensual de publicacion a trav√©s del SiB Colombia
 # Languaje: python
 # Creado:2022-05-04
 # Ultima Actualizacion:2022-06-06
 # Autores: Esteban Marentes, Ricardo Ortiz, Camila Plata
 
-# Proposito y uso: Script para sacar las cifras de publicacion mensuales de un paÌs en GBIF
+# Proposito y uso: Script para sacar las cifras de publicacion mensuales de un pa√≠s en GBIF
 #__________________________________________________________
 
 
@@ -25,8 +25,8 @@ codigoPaisGbif = '7e865cba-7c46-417b-ade5-97f2cf5b7be0'
 # Archivo de organizaciones en Excel. 
 # Antes de descargar el archivo, eliminar las dos filas del comienzo
 
-OrganizacionesRegistradas_AAAAMMDD = pd.read_excel('/Users/estebanmarentes/Desktop/EstebanMH/Recursos AC/OrganizacionesRegistradas_AAAAMMDD.xlsx')
-# Eliminar las columnas inncesarias para dejar ˙nicamente las que se necesitan: Nivel 1, GBIF ID, Logo Github, Nombre corto y URL Portal de Datos SiB
+OrganizacionesRegistradas_AAAAMMDD = pd.read_excel('/Users/estebanmarentes/Desktop/EstebanMH/Recursos AC/reporteMensual/OrganizacionesRegistradas_AAAAMMDD.xlsx')
+# Eliminar las columnas inncesarias para dejar √∫nicamente las que se necesitan: Nivel 1, GBIF ID, Logo Github, Nombre corto y URL Portal de Datos SiB
 OrganizacionesRegistradas_AAAAMMDD = OrganizacionesRegistradas_AAAAMMDD[["GBIF ID", "Nivel 1", "Logo Github","Nombre corto", "URL Portal de Datos SiB"]]
 
 
@@ -34,13 +34,13 @@ OrganizacionesRegistradas_AAAAMMDD.rename(columns = {'GBIF ID': 'publishingOrgan
 
 
 # Archivo del mes anterior
-datasetCO_Anterior_AAAAMMDD = pd.read_csv('/Users/estebanmarentes/Desktop/EstebanMH/Recursos AC/datasetCO_Anterior_AAAAMMDD.txt', encoding = "utf8", sep="\t")
+datasetCO_Anterior_AAAAMMDD = pd.read_csv('/Users/estebanmarentes/Desktop/EstebanMH/Recursos AC/reporteMensual/datasetCO_Anterior_AAAAMMDD.txt', encoding = "utf8", sep="\t")
 
 
 #### 1. Llamada de datos iniciales en el API de GBIF para todos los conjuntos de datos del nodo Colombia a un dataFrame Pandas
 
 response1000_JSON = pd.read_json("http://api.gbif.org/v1/node/" +codigoPaisGbif+ "/dataset?limit=1000") #Llamada al API desde el dato 1 al 1000
-response2000_JSON = pd.read_json("http://api.gbif.org/v1/node/" +codigoPaisGbif+ "/dataset?limit=1000&offset=1000") #Llamada al API desde el dato 1000 al 2000, si hya m·s de 2000 recursos publicados, toca hacer uno llamado extra
+response2000_JSON = pd.read_json("http://api.gbif.org/v1/node/" +codigoPaisGbif+ "/dataset?limit=1000&offset=1000") #Llamada al API desde el dato 1000 al 2000, si hya m√°s de 2000 recursos publicados, toca hacer uno llamado extra
 response3000_JSON = pd.read_json("http://api.gbif.org/v1/node/7e865cba-7c46-417b-ade5-97f2cf5b7be0/dataset?limit=1000&offset=2000") #Llamada al API desde el dato 2000 al 3000
 
 #### 2. Convertir el archivo JSON original para extraer los datos que estaban anidados en el JSON
@@ -57,18 +57,18 @@ resultadosAPI = pd.concat([response1000, response2000, response3000])
 # Escoger solamente las columnas que se van ausar
 resultadosAPI = resultadosAPI[["key", "doi", "type","title", "created", "modified","version", "publishingOrganizationKey"]]
 
-# Separar la informaciÛn de la columna created en aÒo, mes dÌa
+# Separar la informaci√≥n de la columna created en a√±o, mes d√≠a
 resultadosAPI[['created1','created2']] = resultadosAPI.created.str.split("T",expand=True,) # Separa la fecha de la hora usando T como separador
-del resultadosAPI['created2']# Elimina la columna que quedÛ con la hora
-resultadosAPI[['year','month','day']] = resultadosAPI.created1.str.split("-",expand=True,) # Separa la fecha en aÒo, mes dÌa y crea las columnas
+del resultadosAPI['created2']# Elimina la columna que qued√≥ con la hora
+resultadosAPI[['year','month','day']] = resultadosAPI.created1.str.split("-",expand=True,) # Separa la fecha en a√±o, mes d√≠a y crea las columnas
 del resultadosAPI['created']# Elimina la columna original
 resultadosAPI.rename(columns = {'created1':'created'}, inplace = True) # cambia nombre a created de la columna corregida
 
 
-# Separar la informaciÛn de la columna modified en aÒo, mes dÌa
+# Separar la informaci√≥n de la columna modified en a√±o, mes d√≠a
 resultadosAPI[['modified1','modified2']] = resultadosAPI.modified.str.split("T",expand=True,) # Separa la fecha de la hora usando T como separador
-del resultadosAPI['modified2']# Elimina la columna que quedÛ con la hora
-resultadosAPI[['year-mod','month-mod','day-mod']] = resultadosAPI.modified1.str.split("-",expand=True,)# Separa la fecha en aÒo, mes dÌa y crea las columnas
+del resultadosAPI['modified2']# Elimina la columna que qued√≥ con la hora
+resultadosAPI[['year-mod','month-mod','day-mod']] = resultadosAPI.modified1.str.split("-",expand=True,)# Separa la fecha en a√±o, mes d√≠a y crea las columnas
 del resultadosAPI['modified']# Elimina la columna original
 resultadosAPI.rename(columns = {'modified1':'modified'}, inplace = True) # cambia nombre a created de la columna corregida
 
@@ -77,12 +77,12 @@ resultadosAPI[['doi']] = 'http://doi.org/' + resultadosAPI[['doi']].astype(str)
 resultadosAPI.rename(columns = {'doi':'DOI_URL'}, inplace = True)
 
 
-# Modificar el nombre de los type y pasarlo a espaÒol, n este paso toca crear un nuevo DataFrame para guardar el resultado del remplazo
-resultadosAPI['type']=resultadosAPI['type'].replace('OCCURRENCE', 'Registros biolÛgicos').replace('CHECKLIST', 'Listas de especies').replace('METADATA', 'Metadatos').replace('SAMPLING_EVENT', 'Eventos de muestreo')
+# Modificar el nombre de los type y pasarlo a espa√±ol, n este paso toca crear un nuevo DataFrame para guardar el resultado del remplazo
+resultadosAPI['type']=resultadosAPI['type'].replace('OCCURRENCE', 'Registros biol√≥gicos').replace('CHECKLIST', 'Listas de especies').replace('METADATA', 'Metadatos').replace('SAMPLING_EVENT', 'Eventos de muestreo')
 
-# Llamado al API de GBIF API para extraer la informaciÛn del nombre de la organizaciÛn y ponerla en una nueva columna organization
+# Llamado al API de GBIF API para extraer la informaci√≥n del nombre de la organizaci√≥n y ponerla en una nueva columna organization
 api_organization=resultadosAPI[["key","publishingOrganizationKey"]] # subset de los datos con las columnas a llamar
-dfo=api_organization.drop_duplicates('publishingOrganizationKey',inplace=False) # quitar los duplicados para que se m·s r·pido el llamado
+dfo=api_organization.drop_duplicates('publishingOrganizationKey',inplace=False) # quitar los duplicados para que se m√°s r√°pido el llamado
 #Define the gbif API call for publishingOrganizationKey
 def call_gbif_title(row):
     try:
@@ -103,7 +103,7 @@ ok.rename(columns={'title': 'organization', 'key': 'publishingOrganizationKey'},
 resultadosAPI=pd.merge(resultadosAPI,ok,how='left',on='publishingOrganizationKey')
 
 
-# Llamado al API de GBIF API para extraer la informaciÛn endpoints
+# Llamado al API de GBIF API para extraer la informaci√≥n endpoints
 
 api_dataset=resultadosAPI[["key"]] # subset de los datos con las columnas a llamar
 dfdk=api_dataset.drop_duplicates('key',inplace=False)
@@ -123,9 +123,9 @@ dfdk['API_response'] = dfdk.apply(call_gbif_endpoints,axis=1)
 norm_dk = json_normalize(dfdk['API_response'])
 dk = norm_dk[['key','endpoints']]
 
-# Paso intermedio para guardar toda la informaciÛn de dk en un nuevo dataframe
+# Paso intermedio para guardar toda la informaci√≥n de dk en un nuevo dataframe
 dfEndpoints = dk
-# Separar el llamado de los varios diccionarios a 4 columnas, aquÌ est· la magia https://stackoverflow.com/questions/64037243/pythonhow-to-split-column-into-multiple-columns-in-a-dataframe-and-with-dynamic
+# Separar el llamado de los varios diccionarios a 4 columnas, aqu√≠ est√° la magia https://stackoverflow.com/questions/64037243/pythonhow-to-split-column-into-multiple-columns-in-a-dataframe-and-with-dynamic
 d = [pd.DataFrame(dfEndpoints[col].tolist()).add_prefix(col) for col in dfEndpoints.columns]
 dfEndpoints = pd.concat(d, axis=1)
 
@@ -150,7 +150,7 @@ dfEndpoints = dfEndpoints[["key", "nombrecorto", "IPT"]]
 
 resultadosAPI=pd.merge(resultadosAPI,dfEndpoints,how='left',on='key')
 
-#### 5 Obtener n˙mero de registros por conjunto de datos
+#### 5 Obtener n√∫mero de registros por conjunto de datos
 
 ### 5.1 a 5.3
 
@@ -171,44 +171,44 @@ numberOfRecords_AAAAMMDD = pd.json_normalize(JSON_Normalizado['counts'])
 
 numberOfRecords_AAAAMMDD.rename(columns = {'name':'key', 'count':'numberOfRecords'}, inplace = True)
 
-### 5.5 Extraer el n˙mero de registros por dataset y anexarlo al recurso a exportar
+### 5.5 Extraer el n√∫mero de registros por dataset y anexarlo al recurso a exportar
 
 resultadosAPI=pd.merge(resultadosAPI,numberOfRecords_AAAAMMDD,how='left',on='key')
 
 
-#### 6 Asignar el tipo de organizaciÛn publicadora a cada conjunto de datos
+#### 6 Asignar el tipo de organizaci√≥n publicadora a cada conjunto de datos
 # Antes de realizar este paso asegurese de haber cargado los datos al comienzo del archivo y haber seleccionado las columnas a importar
 
-resultadosAPI=pd.merge(resultadosAPI,OrganizacionesRegistradas_AAAAMMDD,how='left',on='publishingOrganizationKey')# Cruzar a informaciÛn desde el archivo de organizaciones
+resultadosAPI=pd.merge(resultadosAPI,OrganizacionesRegistradas_AAAAMMDD,how='left',on='publishingOrganizationKey')# Cruzar a informaci√≥n desde el archivo de organizaciones
 
 
 #### 7 Rastrear los recursos actualizados durante el mes
 
-datasetCO_Anterior_AAAAMMDD = datasetCO_Anterior_AAAAMMDD[['key','numberOfRecords']] #Quedarse solo con la columna del n˙mero de registros
-datasetCO_Anterior_AAAAMMDD.rename(columns={'numberOfRecords': 'IndexaciÛn_MesAnterior'}, inplace=True) # modificar el nombre de la columna numberOfRecors
+datasetCO_Anterior_AAAAMMDD = datasetCO_Anterior_AAAAMMDD[['key','numberOfRecords']] #Quedarse solo con la columna del n√∫mero de registros
+datasetCO_Anterior_AAAAMMDD.rename(columns={'numberOfRecords': 'Indexaci√≥n_MesAnterior'}, inplace=True) # modificar el nombre de la columna numberOfRecors
 #Unir los datos del mes anterior con el dataset general
 resultadosAPI=pd.merge(resultadosAPI,datasetCO_Anterior_AAAAMMDD,how='left',on='key')
 
 
 # Evaluar los datos del presente mes con los datos del mes anterior
-resultadosAPI.loc[resultadosAPI['numberOfRecords'] == resultadosAPI['IndexaciÛn_MesAnterior'], 'Cambios_Datos'] = '1' # Crear la nueva columna evaluando si son iguales y poniendo 0
-resultadosAPI.loc[resultadosAPI['numberOfRecords'] != resultadosAPI['IndexaciÛn_MesAnterior'], 'Cambios_Datos'] = '0' # Modificar la columna para poner 0 sino son iguales
+resultadosAPI.loc[resultadosAPI['numberOfRecords'] == resultadosAPI['Indexaci√≥n_MesAnterior'], 'Cambios_Datos'] = '1' # Crear la nueva columna evaluando si son iguales y poniendo 0
+resultadosAPI.loc[resultadosAPI['numberOfRecords'] != resultadosAPI['Indexaci√≥n_MesAnterior'], 'Cambios_Datos'] = '0' # Modificar la columna para poner 0 sino son iguales
 
-# Poner como 1 el valor de la actualizaciÛn para las listas que al no tener n˙mero de registros dan 0
+# Poner como 1 el valor de la actualizaci√≥n para las listas que al no tener n√∫mero de registros dan 0
 resultadosAPI.loc[resultadosAPI['type'] == 'Listas de especies', 'Cambios_Datos'] = '1'
 
 # Crear la nueva columna indicando que son actualizaciones
-resultadosAPI.loc[resultadosAPI['Cambios_Datos'] == '0', 'Actualizaciones'] = 'ActualizaciÛn'
+resultadosAPI.loc[resultadosAPI['Cambios_Datos'] == '0', 'Actualizaciones'] = 'Actualizaci√≥n'
 
 # Crear la nueva columna Cambios_Datos
 
-resultadosAPI['Incremento_ActualizaciÛn'] = resultadosAPI['numberOfRecords'] - resultadosAPI['IndexaciÛn_MesAnterior']
+resultadosAPI['Incremento_Actualizaci√≥n'] = resultadosAPI['numberOfRecords'] - resultadosAPI['Indexaci√≥n_MesAnterior']
 
 
-#### 8 llamar el n˙mero de citas
+#### 8 llamar el n√∫mero de citas
 
-api_cites=resultadosAPI[["key","publishingOrganizationKey"]] # subset de los datos con las columnas a llamar
-apiCallOrg1=api_cites.drop_duplicates('publishingOrganizationKey',inplace=False) # quitar los duplicados para que se m·s r·pido el llamado
+api_cites=resultadosAPI[["publishingOrganizationKey"]] # subset de los datos por la llave de organizaci√≥n
+apiCallOrg1=api_cites.drop_duplicates('publishingOrganizationKey',inplace=False) # quitar los duplicados para que se m√°s r√°pido el llamado
 #Define the gbif API call for publishingOrganizationKey
 def call_gbif_cites(row):
     try:
@@ -222,9 +222,19 @@ def call_gbif_cites(row):
 
 apiCallOrg1['API_response'] = apiCallOrg1.apply(call_gbif_cites,axis=1) # Llamada del API al interior del datafram
 apiCallOrg1[['offset','limit','endOfRecords','count','results','final']] = json_normalize(apiCallOrg1['API_response']) # Normalizar la llamada y ponerla en las 6 columnas apropiadas
-apiCallOrg1['URL_Citaciones'] = 'https://www.gbif.org/resource/search?contentType=literature&publishingOrganizationKey='+apiCallOrg1['publishingOrganizationKey'] # Crear la columna con el enlace
-apiCallOrg = apiCallOrg1[['publishingOrganizationKey','count','URL_Citaciones']] # Modificar el dataset para conservar solo las columnas que se van a unir
-apiCallOrg.rename(columns={'count': 'total_citesOrg'}, inplace=True) # modificar el nombre de la columna count
+
+# Separar el llamado de los varios diccionarios a 8 columnas
+
+apiCallOrg1 = apiCallOrg1[['publishingOrganizationKey','API_response']] 
+apiCallOrg2 = [pd.DataFrame(apiCallOrg1[col].tolist()).add_prefix(col) for col in apiCallOrg1.columns]
+apiCallOrg3 = pd.concat(apiCallOrg2, axis=1)
+apiCallOrg3 = apiCallOrg3[['publishingOrganizationKey0','API_responsecount']]
+apiCallOrg3.rename(columns={'publishingOrganizationKey0': 'publishingOrganizationKey'}, inplace=True)
+
+
+apiCallOrg3['URL_Citaciones'] = 'https://www.gbif.org/resource/search?contentType=literature&publishingOrganizationKey='+apiCallOrg3['publishingOrganizationKey'] # Crear la columna con el enlace
+apiCallOrg = apiCallOrg3[['publishingOrganizationKey','API_responsecount','URL_Citaciones']] # Modificar el dataset para conservar solo las columnas que se van a unir
+apiCallOrg.rename(columns={'API_responsecount': 'total_citesOrg'}, inplace=True) # modificar el nombre de la columna count
 
 #Unir la llamada del API Cites con el dataset general
 resultadosAPI=pd.merge(resultadosAPI,apiCallOrg,how='left',on='publishingOrganizationKey')
@@ -235,14 +245,14 @@ resultadosAPI=pd.merge(resultadosAPI,apiCallOrg,how='left',on='publishingOrganiz
 
 
 #### 9 Exportar el resultado final completo
-# OrganizaciÛn del resultado del archivo final SIN REALIZAR DE AQUÕ PARA ABAJO
-resultadosFinales = resultadosAPI[[ "key", "total_citesOrg", "URL_Citaciones", "Actualizaciones", "Incremento_ActualizaciÛn", "Cambios_Datos", "IndexaciÛn_MesAnterior", "IPT", "numberOfRecords", "nombrecorto", "type", "organization", "title", "DOI_URL", "created", "year", "month", "day", "modified", "year-mod", "month-mod", "day-mod", "version", "NombreCorto_Org", "Logo", "typeOrg", "publishingOrganizationKey", "URLSocio"]]
+# Organizaci√≥n del resultado del archivo final SIN REALIZAR DE AQU√ç PARA ABAJO
+resultadosFinales = resultadosAPI[[ "key", "total_citesOrg", "URL_Citaciones", "Actualizaciones", "Incremento_Actualizaci√≥n", "Cambios_Datos", "Indexaci√≥n_MesAnterior", "IPT", "numberOfRecords", "nombrecorto", "type", "organization", "title", "DOI_URL", "created", "year", "month", "day", "modified", "year-mod", "month-mod", "day-mod", "version", "NombreCorto_Org", "Logo", "typeOrg", "publishingOrganizationKey", "URLSocio"]]
 # Exportar resultado hasta el momento como datasetCO_AAAAMMDD
-#(MM: mes del reporte, DD:  el ˙ltimo dÌa del mes de reporte,  asÌ el proceso se estÈ realizando en dÌas posteriores)
+#(MM: mes del reporte, DD:  el √∫ltimo d√≠a del mes de reporte,  as√≠ el proceso se est√© realizando en d√≠as posteriores)
 x='datasetCO_20220531.csv'
-resultadosFinales.to_csv('/Users/estebanmarentes/Desktop/EstebanMH/Recursos AC/' + x, sep="\t", encoding = "utf8")
+resultadosFinales.to_csv('/Users/estebanmarentes/Desktop/EstebanMH/Recursos AC/reporteMensual/resultadoReporte/' + x, sep="\t", encoding = "utf8")
 y='datasetCO_20220531.xlsx'
-resultadosFinales.to_excel('/Users/estebanmarentes/Desktop/EstebanMH/Recursos AC/' + y)
+resultadosFinales.to_excel('/Users/estebanmarentes/Desktop/EstebanMH/Recursos AC/reporteMensual/resultadoReporte/' + y)
 
 #### 10 Exportar los datos parciales que toca pegar en el dataStudio
 
@@ -252,7 +262,7 @@ resultadosFinales.to_excel('/Users/estebanmarentes/Desktop/EstebanMH/Recursos AC
 resultadosTipoPublicador = resultadosFinales[[ "organization","typeOrg", "URLSocio", "publishingOrganizationKey"]]
 
 x='datasetCO_20220531TipoPublicador.xlsx'
-resultadosTipoPublicador.to_excel('/Users/estebanmarentes/Desktop/EstebanMH/Recursos AC/' + x)
+resultadosTipoPublicador.to_excel('/Users/estebanmarentes/Desktop/EstebanMH/Recursos AC/reporteMensual/resultadoReporte/' + x)
 
 
 # Todos los publicadores/Tipo de publicador / N. Registros / Total-Tipo
@@ -261,7 +271,7 @@ resultadosNumeroRegistros = resultadosFinales[[ "organization","typeOrg", "numbe
 resultadosNumeroRegistros.sort_values('organization')
 
 x='datasetCO_20220531NumeroRegistros.xlsx'
-resultadosNumeroRegistros.to_excel('/Users/estebanmarentes/Desktop/EstebanMH/Recursos AC/' + x)
+resultadosNumeroRegistros.to_excel('/Users/estebanmarentes/Desktop/EstebanMH/Recursos AC/reporteMensual/resultadoReporte/' + x)
 
 
 # Cifras uso de datos (citaciones)
@@ -270,7 +280,7 @@ resultadosCitaciones = resultadosFinales[[ "organization","typeOrg", "total_cite
 
 resultadosCitaciones=resultadosCitaciones.drop_duplicates('organization',inplace=False)
 x='datasetCO_20220531Citaciones.xlsx'
-resultadosCitaciones.to_excel('/Users/estebanmarentes/Desktop/EstebanMH/Recursos AC/' + x)
+resultadosCitaciones.to_excel('/Users/estebanmarentes/Desktop/EstebanMH/Recursos AC/reporteMensual/resultadoReporte/' + x)
 
 
 
